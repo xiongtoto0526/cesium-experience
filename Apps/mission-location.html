@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <!-- Use correct character set. -->
+  <meta charset="utf-8">
+  <!-- Tell IE to use the latest, best version. -->
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <!-- Make the application on mobile take up the full browser screen and disable user scaling. -->
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no">
+  <title>Hello World!</title>
+  <script src="../Build/Cesium/Cesium.js"></script>
+  <style>
+      @import url(../Build/Cesium/Widgets/widgets.css);
+      html, body, #cesiumContainer {
+          width: 100%; height: 100%; margin: 0; padding: 0; overflow: hidden;
+      }
+  </style>
+</head>
+<body>
+  <div id="cesiumContainer"></div>
+  <div id='positionID' style="z-index: 1000;position: absolute;top: 0;left: 0;color: white;"></div>
+    <script>
+        var theParams = {
+            destination: Cesium.Rectangle.fromDegrees(119.450, 26.615, 119.451, 26.835),
+            orientation: new Cesium.HeadingPitchRoll.fromDegrees(-5, -45, 0),
+            endTransform: Cesium.Matrix4.IDENTITY
+        };
+      var viewer = new Cesium.Viewer("cesiumContainer", 
+        {          
+               imageryProvider : new Cesium.ArcGisMapServerImageryProvider({
+                     url : 'http://58.22.3.130:6688/arcgis/rest/services/fujiansatellite/fjsatellitePlus_Coll/MapServer'
+                     }) 
+        }); 
+
+       viewer.camera.setView(theParams);
+
+        var scene = viewer.scene;
+        var canvas = viewer.scene.canvas;
+        var handler = new Cesium.ScreenSpaceEventHandler(scene.canvas); 
+        var movementListenFlag = true;
+        handler.setInputAction(function (movement) {
+          if (!movementListenFlag) {
+            return;
+          }
+          var cartesian = scene.camera.pickEllipsoid(movement.endPosition, ellipsoid);
+          var ellipsoid = scene.globe.ellipsoid;
+          //能获取，显示坐标
+          if (cartesian) { 
+          var cartographic = ellipsoid.cartesianToCartographic(cartesian);
+          var coords = '经度' + Cesium.Math.toDegrees(cartographic.longitude) + ', ' + '纬度' + Cesium.Math.toDegrees(cartographic.latitude) + ',' + '高度' + Math.ceil(viewer.camera.positionCartographic.height);
+          document.getElementById('positionID').innerHTML = coords; 
+          console.log(coords);
+          document.getElementById('positionID').style.display = '';
+          } 
+          //不能获取不显示
+          else { 
+              document.getElementById('positionID').style.display = 'none'; 
+            }
+        }, Cesium.ScreenSpaceEventType.MOUSE_MOVE);
+
+        handler.setInputAction(function (movement) {
+         movementListenFlag = !movementListenFlag;
+        }, Cesium.ScreenSpaceEventType.RIGHT_CLICK);
+
+
+            </script>
+        </body>
+        </html>
