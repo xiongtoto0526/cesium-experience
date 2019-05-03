@@ -53,7 +53,10 @@
           if (cartesian) { 
           currentCartesian = cartesian;
           var cartographic = ellipsoid.cartesianToCartographic(cartesian);
-          var coords = '' + Cesium.Math.toDegrees(cartographic.longitude) + ', ' + '' + Cesium.Math.toDegrees(cartographic.latitude) + ',' + '' + Math.ceil(viewer.camera.positionCartographic.height) + ';   ' ;
+          var coords = '' + Cesium.Math.toDegrees(cartographic.longitude) + ', ' 
+          + '' + Cesium.Math.toDegrees(cartographic.latitude)  + ',' 
+          //  + '' + Math.ceil(viewer.camera.positionCartographic.height) + ';   ' 
+          ;
           document.getElementById('positionID').innerHTML = coords; 
           console.log(coords);
           document.getElementById('positionID').style.display = '';
