@@ -17,8 +17,10 @@
   </style>
 </head>
 <body>
+  <div style="z-index: 1000;position: absolute;top: 0;right: 0;color: white;"></div>
   <div id="cesiumContainer"></div>
-  <div id='positionID' style="z-index: 1000;position: absolute;top: 0;left: 0;color: white;"></div>
+  <div style="z-index: 1000;position: absolute;top: 0;left: 0;color: white;">经度，维度，高度 (右键双击取点，左键显示)</div>
+  <div id='positionID' style="z-index: 1000;position: absolute;top: 20px;left: 0;color: white;"></div>
     <script>
         var theParams = {
             destination: Cesium.Rectangle.fromDegrees(119.450, 26.615, 119.451, 26.835),
@@ -38,6 +40,9 @@
         var canvas = viewer.scene.canvas;
         var handler = new Cesium.ScreenSpaceEventHandler(scene.canvas); 
         var movementListenFlag = true;
+        var coordList = [];
+        var newCoord = '';
+        var currentCartesian;
         handler.setInputAction(function (movement) {
           if (!movementListenFlag) {
             return;
@@ -46,11 +51,13 @@
           var ellipsoid = scene.globe.ellipsoid;
           //能获取，显示坐标
           if (cartesian) { 
+          currentCartesian = cartesian;
           var cartographic = ellipsoid.cartesianToCartographic(cartesian);
-          var coords = '经度' + Cesium.Math.toDegrees(cartographic.longitude) + ', ' + '纬度' + Cesium.Math.toDegrees(cartographic.latitude) + ',' + '高度' + Math.ceil(viewer.camera.positionCartographic.height);
+          var coords = '' + Cesium.Math.toDegrees(cartographic.longitude) + ', ' + '' + Cesium.Math.toDegrees(cartographic.latitude) + ',' + '' + Math.ceil(viewer.camera.positionCartographic.height) + ';   ' ;
           document.getElementById('positionID').innerHTML = coords; 
           console.log(coords);
           document.getElementById('positionID').style.display = '';
+          newCoord = coords;
           } 
           //不能获取不显示
           else { 
@@ -60,7 +67,28 @@
 
         handler.setInputAction(function (movement) {
          movementListenFlag = !movementListenFlag;
+
+         if(coordList.indexOf(newCoord) >= 0){
+          return;
+         }
+         coordList.push(newCoord);
+         viewer.entities.add({
+                    position: currentCartesian,
+                    point: {
+                        color: Cesium.Color.RED,
+                        pixelSize: 5,
+                        heightReference: Cesium.HeightReference.CLAMP_TO_GROUND
+                    }
+                });
         }, Cesium.ScreenSpaceEventType.RIGHT_CLICK);
+
+        handler.setInputAction(function (movement) {
+          var message = "坐标值列表：";
+          for (var i = 0; i < coordList.length; i++) {
+            message = message + coordList[i];
+          }
+         alert(message)
+        }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
 
 
             </script>
