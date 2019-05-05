@@ -19,7 +19,8 @@
 <body>
   <div style="z-index: 1000;position: absolute;top: 0;right: 0;color: white;"></div>
   <div id="cesiumContainer"></div>
-  <div style="z-index: 1000;position: absolute;top: 0;left: 0;color: white;">经度，维度，高度 (右键双击取点，左键显示)</div>
+  <div style="z-index: 1000;position: absolute;top: 0;left: 0;color: white;">经度，维度，高度 (右键双击取点，左键显示结果， 中键清空所有)</div>
+
   <div id='positionID' style="z-index: 1000;position: absolute;top: 20px;left: 0;color: white;"></div>
     <script>
         var theParams = {
@@ -92,6 +93,12 @@
           }
          alert(message)
         }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
+
+        handler.setInputAction(function (movement) {
+         console.log("清空所有点"); 
+         viewer.entities.removeAll();
+         coordList = [];
+        }, Cesium.ScreenSpaceEventType.MIDDLE_CLICK);
 
 
             </script>
